@@ -1,0 +1,5 @@
+
+export const HANDLE_INPUT_CHANGE = 'HANDLE_INPUT_CHANGE'
+export const ADD_TODOLIST = 'ADD_TODOLIST'
+export const DEL_TODO_ITEM = 'DEL_TODO_ITEM'
+export const GET_INIT_LIST = 'GET_INIT_LIST'

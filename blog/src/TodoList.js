@@ -1,51 +1,65 @@
 import React, { Component, Fragment } from 'react'
+import 'antd/dist/antd.css'
+import './style.css'
+import { Input, Button, List } from 'antd'
+import {
+  getInputChangeAction,
+  addTodoListAction,
+  delTodoList,
+  getInitListAction
+}from './store/actionCreators'
+import store from './store'
 
 class TodoList extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      inputValue: '',
-      list: []
-    }
+    this.state = store.getState()
+    this.handleInputChange = this.handleInputChange.bind(this)
+    store.subscribe(this.handStoreChange)
   }
-  handleInputChange (e) {
-    this.setState({
-      inputValue: e.target.value
-    })
+  componentDidMount(){
+    const action = getInitListAction()
+    store.dispatch(action)
   }
-  add () {
-    if (this.state.inputValue) {
-      let _list = this.state.list
-      _list.push(this.state.inputValue)
-      this.setState({
-        inputValue: '',
-        list: _list
-      })
-    }
-  }
-  remove (index) {
-    this.state.list.splice(index, 1)
 
-    this.setState({
-      list: this.state.list
-    })
+  handStoreChange = () =>{
+    this.setState(store.getState())
   }
+
+  handleInputChange (e) {
+    const action = getInputChangeAction(e.target.value)
+    store.dispatch(action)
+  }
+
+  add = () => {
+    if (this.state.inputValue) {
+      const action = addTodoListAction(this.state.inputValue)
+     store.dispatch(action)
+    }
+  }
+
+  remove = (index) => {
+    const action = delTodoList(index)
+    store.dispatch(action)
+  }
+
   render () {
     return (
       <Fragment>
         <div>
-          <input type='text' value={this.state.inputValue} onChange={this.handleInputChange.bind(this)} />
-          <button onClick={this.add.bind(this)}>提交</button>
+          <Input 
+          value = {this.state.inputValue}
+          placeholder="Basic usage" 
+          style={{width: 300, marginRight: 20, marginTop: 20}}
+          onChange={this.handleInputChange} />
+          <Button type="primary" onClick={this.add}>提交</Button>
         </div>
-        <ul>
-          {
-           this.state.list.map((item, index) => {
-             return (
-               <li key={index}>{item} <span onClick={this.remove.bind(this, index)}>X</span></li>
-             )
-           })
-         }
-        </ul>
+        <List
+          style={{width: 300, marginTop: 20}}
+          bordered
+          dataSource={this.state.list}
+          renderItem={(item,index) => (<List.Item onClick={this.remove.bind(this,index)}>{item}</List.Item>)}
+        />
       </Fragment>
     )
   }
